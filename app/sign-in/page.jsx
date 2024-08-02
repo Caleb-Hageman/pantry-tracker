@@ -106,7 +106,7 @@ const SignInPage = () => {
             onMouseOver={(e) => (e.target.style.color = 'blue')}
             onMouseOut={(e) => (e.target.style.color = 'inherit')}
           >
-            Don't have an account? Sign up
+            Don&apos;t have an account? Sign up
           </Typography>
         </Box>
       </Grid>

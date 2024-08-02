@@ -81,7 +81,7 @@ export default function Home() {
       setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (user) {
