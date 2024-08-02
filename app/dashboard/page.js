@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Box, Typography, Stack, Button, Modal, TextField} from '@mui/material'
 import {firestore, auth} from '@/app/firebase/config'
 import {collection, doc, query, getDocs, setDoc, deleteDoc, getDoc} from 'firebase/firestore'
@@ -36,6 +36,14 @@ export default function Home() {
 
   const [itemName, setItemName] = useState('')
 
+    // State to hold the search query
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Filtered items based on the search query
+    const filteredItems = pantry.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
   const updatePantry = async (uid) => {
     try {
       const snapshot = query(collection(firestore, `users/${uid}/pantry`));
@@ -44,7 +52,6 @@ export default function Home() {
       docs.forEach((doc) => {
         pantryList.push({ name: doc.id, ...doc.data() });
       });
-      console.log(pantryList);
       setPantry(pantryList);
     } catch (error) {
       console.error("Error fetching pantry items:", error);
@@ -55,7 +62,6 @@ export default function Home() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log({user})
             if (user.emailVerified) {
                 const userDoc = await getDoc(doc(firestore, "users", user.uid));
                 if (userDoc.exists()) {
@@ -169,7 +175,14 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
-    <Button variant="contained" onClick={handleOpen}> Touch ME!!! </Button>
+    <Button variant="contained" onClick={handleOpen}> Add Item </Button>
+    <TextField
+        label="Search Pantry"
+        variant="outlined"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ width: '800px', mb: 2 }}
+    />
     <Box 
     border={'1px solid #333'}>
       <Box 
@@ -186,12 +199,13 @@ export default function Home() {
         </Typography>
       </Box>
       <Stack width="800px" height="300px" spacing={1} overflow={'auto'}>
-        {pantry.map(({name, count}) => (
+        {filteredItems.map(({name, count}) => (
           
           <Box 
             key={name}
             width="100%"
-            height="150px"
+            minHeight="150px"
+            maxHeight="150px"
             display={'flex'}
             justifyContent={'space-between'}
             alignItems={'center'}
